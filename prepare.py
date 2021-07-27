@@ -20,7 +20,7 @@ def basic_clean(stringcheese):
         .encode('ascii','ignore')\
         .decode('utf-8')
     #replace stuff that is not letter, number, whitespace, or single quote
-    stringcheese = re.sub(r"[^a-z0-9'\s]", '', stringcheese)
+    stringcheese = re.sub(r"[^\w\s']", '', stringcheese).lower()
     
     #return our basic clean string
     return stringcheese
@@ -37,6 +37,7 @@ def tokenize(stringcheese):
     stringcheese = tokenizer.tokenize(stringcheese, return_str=True)
 
     return stringcheese
+
 
 def stem(stringcheese):
     '''
@@ -72,7 +73,7 @@ def lemmatize(stringcheese):
     return lemmas
 
 
-def remove_stopwords(words):
+def remove_stopwords(words, extra_words=[], exclude_words=[]):
     '''
     takes in some text and removes stop words
     '''
@@ -90,10 +91,10 @@ def remove_stopwords(words):
     #only keep words that are not in the stopwords list
     filtered_words = [word for word in words if word not in stopword_list]
     #separate our filtered words with spaces
-    article_without_stopwords = ' '.join(filtered_words)
+    text_without_stopwords = ' '.join(filtered_words)
     
-    #return our article with no stop words
-    return article_without_stopwords
+    #return our text with no stop words
+    return text_without_stopwords
 
 
 def prep_article_data(df, content, extra_words=[], exclude_words=[]):
@@ -109,22 +110,17 @@ def prep_article_data(df, content, extra_words=[], exclude_words=[]):
     df['title'] = df.title
     
     #original content
-    df['original']= df.content   
+    df['original']= df[content]   
     df['clean'] = df[content].apply(basic_clean)\
                     .apply(tokenize)\
-                    .apply(remove_stopwords)
+                    .apply(lambda x: remove_stopwords(x, extra_words, exclude_words))
     
     #stemmed
-    df['stemmed']= df[content].apply(basic_clean)\
-                    .apply(tokenize)\
-                    .apply(stem)\
-                    .apply(remove_stopwords, extra_words = extra_words, exclude_words = exclude_words)
-    
+    df['stemmed']= df['clean'].apply(stem)
+
     #lemmatized
-    df['lemmatized'] = df[content].apply(basic_clean)\
-                    .apply(tokenize)\
-                    .apply(lemmatize)\
-                    .apply(remove_stopwords, extra_words = extra_words, exclude_words = exclude_words)
+    df['lemmatized'] = df['clean'].apply(lemmatize)
+ 
     
     #put it all together
     return df[['title', 'original','clean','stemmed','lemmatized']] 
