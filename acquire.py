@@ -45,6 +45,16 @@ def get_blog_articles(urls):
     #return the new dictionary of all titles and 
     return posts
 
+def get_codeup_blogs():
+    urls = ['https://codeup.com/codeups-data-science-career-accelerator-is-here/', 
+        'https://codeup.com/data-science-myths/', 
+        'https://codeup.com/data-science-vs-data-analytics-whats-the-difference/', 
+        'https://codeup.com/10-tips-to-crush-it-at-the-sa-tech-job-fair/', 
+        'https://codeup.com/competitor-bootcamps-are-closing-is-the-model-in-danger/']
+    
+    return get_blog_articles(urls)
+
+#####################################
 
 def get_article(article, category):
     '''
@@ -65,6 +75,7 @@ def get_article(article, category):
     
     #return the dictionary
     return output
+
 
 
 def get_articles(category, base ="https://inshorts.com/en/read/"):
